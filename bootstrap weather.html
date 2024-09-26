@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Weather App</title>
+    <style>
+        #main {
+            border-radius: 39px;
+        }
+        #one {
+            background-color: lightblue;
+            height: 100vh;
+            width: 100vw;
+        }
+        .form-control {
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            color: black;
+        }
+        .btn-sexy {
+            background-color: #ff416c;
+            background-image: linear-gradient(to right, #ff4b2b, #ff416c);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            transition: transform 0.3s ease;
+        }
+        .btn-sexy:hover {
+            transform: scale(1.1);
+            background-image: linear-gradient(to right, #ff6a4b, #ff789e);
+        }
+        #sms {
+            position: relative;
+            height: 50px;
+            width: 50px;
+        }
+    </style>
+  </head>
+  <body>
+    <section class="vh-100" id="one">
+        <div class="container py-5 h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-10 col-lg-8 col-xl-6">
+              <div class="card bg-dark text-white" style="border-radius: 40px;">
+                <div class="bg-image" style="border-radius: 35px;">
+                  <img src="weather.jpg.webp" class="card-img" alt="weather" id="main" />
+                  <div class="mask" style="background-color: rgba(190, 216, 232, .5);"></div>
+                </div>
+                <div class="card-img-overlay text-dark p-5">
+                  <h4 class="mb-0" id="hone">Juneau, Alaska, US</h4>
+                  <p class="display-2 my-3" id="pone">1.28°C</p>
+                  <p class="mb-2">Feels Like: <strong id="sone">-1.08 °C</strong></p>
+                  <!-- Input field and button -->
+                  <div class="mt-4">
+                    <input type="text" id="cityInput" class="form-control mb-3" placeholder="Enter City" />
+                    <button type="button" class="btn btn-sexy">Get Weather</button>
+                    <img src="" alt="" id="sms">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <script>
+      let image = document.getElementById('sms');
+      let city = document.getElementById('hone');
+      let temprature = document.getElementById('pone');
+      let feels = document.getElementById('sone');
+      let btn = document.querySelector('button');
+      let inputfield = document.querySelector('input');
+      let og=localStorage.getItem("tskarr");
+      if(og)
+    {
+      let d=JSON.parse(og);
+      makeUI(d);
+    }
+btn.addEventListener('click',function(){
+  let query=inputfield.value;
+  inputfield.value="";
+  if(query.trim()=="")
+{
+  alert("field is empty");
+  return;
+}
+fetchdata(query);
+});
+     async function fetchdata(data)
+     {
+      try{
+      let data1=await fetch(`http://api.weatherapi.com/v1/current.json?key=65ecdda3adb640e28d932717241709&q=${data}&aqi=yes`);
+      let data2=await data1.json();
+     breakdata(data2);
+      }
+      catch(error)
+      {
+        alert("city not found");
+        return;
+      }
+     } 
+     function breakdata(data3)
+     {
+      const {name,region,country}=data3.location;
+      const {temp_c,feelslike_c,condition}=data3.current;
+    const {icon}=condition;
+    let obj={
+      name,region,country,temp_c,feelslike_c,iconURL:icon
+    }
+    localStorage.setItem("tskarr",JSON.stringify(obj));
+    makeUI(obj);
+     }
+     function makeUI(ob)
+     {
+      image.src=ob.iconURL;
+      city.innerText=ob.name+" , "+ob.region+" , "+ob.country;
+      temprature.innerText=ob.temp_c+"°C";
+      feels.innerText=ob.feelslike_c+"°C";
+     }
+    </script>
+  </body>
+</html>
